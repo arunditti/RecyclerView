@@ -1,23 +1,18 @@
 package com.arunditti.android.recyclerview;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
-import android.widget.TextView;
+import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MovieAdapter.ListItemClickListener {
 
     private MovieAdapter mAdapter;
     RecyclerView mRecyclerView;
     int[] mMovieList;
+
+    private Toast mToast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,9 +28,25 @@ public class MainActivity extends AppCompatActivity {
                 R.drawable.ic_launcher_background, R.drawable.ic_launcher_background, R.drawable.ic_launcher_background, R.drawable.ic_launcher_background,
                 R.drawable.ic_launcher_background, R.drawable.ic_launcher_background, R.drawable.ic_launcher_background};
 
-        mAdapter = new MovieAdapter(MainActivity.this, mMovieList);
+        mAdapter = new MovieAdapter(this, MainActivity.this, mMovieList);
 
         //Link the adapter to the RecyclerView
         mRecyclerView.setAdapter(mAdapter);
+    }
+
+    @Override
+    public void onListItemClick(int clickedItemIndex) {
+        // In the beginning of the method, cancel the Toast if it isn't null
+
+        if (mToast != null) {
+            mToast.cancel();
+        }
+
+        //  Show a Toast when an item is clicked, displaying that item number that was clicked
+
+        String toastMessage = "Item #" + clickedItemIndex + " clicked.";
+        mToast = Toast.makeText(this, toastMessage, Toast.LENGTH_LONG);
+
+        mToast.show();
     }
 }

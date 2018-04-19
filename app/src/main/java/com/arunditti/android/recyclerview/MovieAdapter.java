@@ -8,8 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import java.util.List;
-
 /**
  * Created by arunditti on 4/19/18.
  */
@@ -18,36 +16,37 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
     private static final String TAG = MovieAdapter.class.getSimpleName();
 
-    //Class variables for the cursor that holds context
-    private Context mContext;
+    final private ListItemClickListener mOnClickListener;
+    private final Context mContext;
+
+    /**
+     * The interface that receives onClick messages.
+     */
+    public interface ListItemClickListener {
+        void onListItemClick(int clickedItemIndex);
+    }
+
     private int[] mMovieList;
 
-    //Constructor for the TaskCursorAdapter that initializes the context
-    public MovieAdapter(Context context, int[] movieList) {
-        this.mContext = context;
+    public MovieAdapter(Context mContext, ListItemClickListener mOnClickListener, int[] movieList) {
+        this.mOnClickListener = mOnClickListener;
         this.mMovieList = movieList;
+        this.mContext = mContext;
     }
 
     @Override
     public MovieAdapterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        Context context = parent.getContext();
         //Get the RecyclerView item layout
-        LayoutInflater inflater = LayoutInflater.from(mContext);
+        LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.movie_list_item, parent, false);
         return new MovieAdapterViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final MovieAdapterViewHolder holder, int position) {
-        holder.mMovies.setImageResource(mMovieList[position]);
-        holder.mMovies.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent mIntent = new Intent(mContext, DetailActivity.class);
-                mIntent.putExtra("Movie", mMovieList[holder.getAdapterPosition()]);
-                mContext.startActivity(mIntent);
-            }
-        });
-
+       int movieId = mMovieList[position];
+        holder.mMovies.setImageResource(movieId);
     }
 
     @Override
@@ -56,16 +55,20 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     }
 
     //Create a class within MovieAdapter  called MovieAdapterViewHolder
-    public class MovieAdapterViewHolder extends RecyclerView.ViewHolder{
+    public class MovieAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView mMovies;
 
         public MovieAdapterViewHolder(View itemView) {
             super(itemView);
 
             mMovies = itemView.findViewById(R.id.movie_poster);
+            itemView.setOnClickListener(this);
+        }
 
+        @Override
+        public void onClick(View v) {
+            int clickedPosition = getAdapterPosition();
+            mOnClickListener.onListItemClick(clickedPosition);
         }
     }
-
-
 }
